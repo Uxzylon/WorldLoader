@@ -6,7 +6,8 @@
   "mixins": [
     "QueryResponseMixin",
     "PlayerManagerMixin",
-    "ClientConnectionMixin"
+    "ClientConnectionMixin",
+    "BroadcastChatMessageMixin"
   ],
   "injectors": {
     "defaultRequire": 1
