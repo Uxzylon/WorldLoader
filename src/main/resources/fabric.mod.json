@@ -9,8 +9,6 @@
     "Uxzylon"
   ],
 
-  "icon": "assets/playertabhider/icon.png",
-
   "environment": "server",
   "entrypoints": {
     "main": [
