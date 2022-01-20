@@ -4,6 +4,7 @@
   "package": "com.gmail.anthony17j.worldloader.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "ClientConnectionMixin"
   ],
   "injectors": {
     "defaultRequire": 1
