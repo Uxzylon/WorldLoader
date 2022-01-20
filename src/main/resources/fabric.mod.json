@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "worldloader",
+  "version": "${version}",
+
+  "name": "WorldLoader",
+  "description": "Keep the overworld loaded without any players",
+  "authors": [
+    "Uxzylon"
+  ],
+
+  "icon": "assets/playertabhider/icon.png",
+
+  "environment": "server",
+  "entrypoints": {
+    "main": [
+      "com.gmail.anthony17j.worldloader.WorldLoader"
+    ]
+  },
+  "mixins": [
+    "worldloader.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.11.3",
+    "fabric": "*",
+    "minecraft": "1.18.x",
+    "java": ">=17"
+  }
+}
