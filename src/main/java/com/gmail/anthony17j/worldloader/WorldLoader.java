@@ -14,11 +14,13 @@ public class WorldLoader implements ModInitializer {
 
 	public static final Logger LOGGER = LogManager.getLogger();
 
+	public static PlayerEntity worldloader;
+
 	@Override
 	public void onInitialize() {
 		ServerWorldEvents.LOAD.register(((server, world) -> {
 			if (Objects.equals(world.getRegistryKey().getValue().getPath(), "overworld")) {
-				PlayerEntity player = EntityPlayerFake.createFake(new String("#worldloader#"), server, 0, -70, 0, 0, 0, world.getRegistryKey(), GameMode.SPECTATOR);
+				worldloader = EntityPlayerFake.createFake(new String("#worldloader#"), server, 0, -70, 0, 0, 0, world.getRegistryKey(), GameMode.SPECTATOR);
 			}
 		}));
 	}
