@@ -5,8 +5,7 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "PlayerManagerMixin",
-    "ClientConnectionMixin",
-    "BroadcastChatMessageMixin"
+    "ClientConnectionMixin"
   ],
   "injectors": {
     "defaultRequire": 1

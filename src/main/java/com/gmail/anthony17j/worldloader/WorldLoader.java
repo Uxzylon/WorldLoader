@@ -20,7 +20,7 @@ public class WorldLoader implements ModInitializer {
 	public void onInitialize() {
 		ServerWorldEvents.LOAD.register(((server, world) -> {
 			if (Objects.equals(world.getRegistryKey().getValue().getPath(), "overworld")) {
-				worldloader = EntityPlayerFake.createFake(new String("#worldloader#"), server, 0, -70, 0, 0, 0, world.getRegistryKey(), GameMode.SPECTATOR);
+				worldloader = EntityPlayerFake.createFake("#worldloader#", server, 0, -70, 0, 0, 0, world.getRegistryKey(), GameMode.SPECTATOR);
 			}
 		}));
 	}
