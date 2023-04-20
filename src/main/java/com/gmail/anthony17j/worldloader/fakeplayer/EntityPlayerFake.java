@@ -21,7 +21,6 @@ public class EntityPlayerFake extends ServerPlayerEntity {
         server.getPlayerManager().onPlayerConnect(new ClientConnectionFake(NetworkSide.SERVERBOUND), instance);
         instance.teleport(worldIn, d0, d1, d2, (float)yaw, (float)pitch);
         instance.setHealth(20.0F);
-        instance.stepHeight = 0.6F;
         instance.interactionManager.changeGameMode(gamemode);
         return instance;
     }

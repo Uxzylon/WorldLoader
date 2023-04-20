@@ -2,6 +2,7 @@ package com.gmail.anthony17j.worldloader.mixin;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.ClientConnection;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
@@ -18,39 +19,30 @@ import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 
 import java.util.List;
+import java.util.Objects;
 
 @Mixin(PlayerManager.class)
 public abstract class PlayerManagerMixin {
 
-    // @Shadow @Final private static final Logger LOGGER = LogUtils.getLogger();
-    // @Shadow @Final private List<ServerPlayerEntity> players;
+    @Shadow @Final private static final Logger LOGGER = LogUtils.getLogger();
+    @Shadow @Final private List<ServerPlayerEntity> players;
 
     @Shadow @Final private MinecraftServer server;
 
     @Shadow public abstract NbtCompound loadPlayerData(ServerPlayerEntity player);
     @Shadow public abstract void sendWorldInfo(ServerPlayerEntity player, ServerWorld world);
 
-    @Inject(method = "onPlayerConnect(Lnet/minecraft/network/ClientConnection;Lnet/minecraft/server/network/ServerPlayerEntity;)V", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "onPlayerConnect(Lnet/minecraft/network/ClientConnection;Lnet/minecraft/server/network/ServerPlayerEntity;)V", at = @At("TAIL"))
     public void onPlayerConnect(ClientConnection connection, ServerPlayerEntity player, CallbackInfo ci) {
-
         if (player.getGameProfile().getName().equals("#worldloader#")) {
-            NbtCompound nbtCompound = this.loadPlayerData(player);
-            ServerWorld serverWorld = this.server.getWorld(player.getEntityWorld().getRegistryKey());
-            player.setWorld(serverWorld);
-            BlockPos spawnPoint = serverWorld.getSpawnPos();
-            player.setGameMode(nbtCompound);
-            new ServerPlayNetworkHandler(this.server, connection, player);
-            // this.players.add(player); // Visible to others
-            serverWorld.onPlayerConnected(player);
-            this.server.getBossBarManager().onPlayerConnect(player);
-            this.sendWorldInfo(player, serverWorld);
-            this.server.getResourcePackProperties().ifPresent(properties -> player.sendResourcePackUrl(properties.url(), properties.hash(), properties.isRequired(), properties.prompt()));
-            player.sendServerMetadata(this.server.getServerMetadata());
-            player.onSpawn();
-            player.teleport(spawnPoint.getX(), -70, spawnPoint.getZ());
-            // LOGGER.info("{}[{}] logged in with entity id {} at ({}, {}, {})", player.getName().getString(), "local", player.getId(), player.getX(), player.getY(), player.getZ());
+            this.players.remove(player);
+        }
+    }
+
+    @Inject(method = "sendToAll", at = @At("HEAD"), cancellable = true)
+    public void sendToAll(Packet<?> packet, CallbackInfo ci) {
+        if (packet.toString().contains("#worldloader#")) {
             ci.cancel();
         }
-
     }
 }
