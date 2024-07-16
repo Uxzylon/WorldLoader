@@ -31,14 +31,14 @@ public abstract class PlayerManagerMixin {
     
     @Inject(method = "onPlayerConnect", at = @At("TAIL"))
     public void onPlayerConnect(ClientConnection connection, ServerPlayerEntity player, ConnectedClientData clientData, CallbackInfo ci) {
-        if (player.getGameProfile().getName().equals("playerName")) {
+        if (player.getGameProfile().getName().equals(playerName)) {
             this.players.remove(player);
         }
     }
 
     @Inject(method = "sendToAll", at = @At("HEAD"), cancellable = true)
     public void sendToAll(Packet<?> packet, CallbackInfo ci) {
-        if (packet.toString().contains("playerName")) {
+        if (packet.toString().contains(playerName)) {
             ci.cancel();
         }
     }
