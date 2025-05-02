@@ -1,35 +1,68 @@
 package com.gmail.anthony17j.worldloader.fakeplayer;
 
+import com.gmail.anthony17j.worldloader.WorldLoader;
 import com.mojang.authlib.GameProfile;
-import net.minecraft.network.NetworkSide;
-import net.minecraft.network.packet.c2s.common.SyncedClientOptions;
-import net.minecraft.registry.RegistryKey;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.network.protocol.PacketFlow;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ConnectedClientData;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.UserCache;
-import net.minecraft.world.GameMode;
-import net.minecraft.world.World;
+import net.minecraft.server.level.ClientInformation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.CommonListenerCookie;
+import net.minecraft.server.players.GameProfileCache;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.SkullBlockEntity;
+import net.minecraft.world.phys.Vec3;
 
-public class EntityPlayerFake extends ServerPlayerEntity {
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
-    public static EntityPlayerFake createFake(String username, MinecraftServer server, double d0, double d1, double d2, double yaw, double pitch, RegistryKey<World> dimensionId, GameMode gamemode)
+public class EntityPlayerFake extends ServerPlayer {
+
+    public Runnable fixStartingPosition = () -> {};
+
+    public static void createFake(String username, MinecraftServer server, Vec3 pos, double yaw, double pitch, ResourceKey<Level> dimensionId, GameType gamemode)
     {
-        ServerWorld worldIn = server.getWorld(dimensionId);
-        UserCache.setUseRemote(false);
-        GameProfile gameprofile = server.getUserCache().findByName(username).orElse(null);
-        EntityPlayerFake instance = new EntityPlayerFake(server, worldIn, gameprofile);
-        ConnectedClientData connectedClientData = new ConnectedClientData(gameprofile, 0, SyncedClientOptions.createDefault(), true);
-        server.getPlayerManager().onPlayerConnect(new ClientConnectionFake(NetworkSide.SERVERBOUND), instance, connectedClientData);
-        instance.teleport(worldIn, d0, d1, d2, (float)yaw, (float)pitch);
-        instance.setHealth(20.0F);
-        instance.interactionManager.changeGameMode(gamemode);
-        return instance;
+        ServerLevel worldIn = server.getLevel(dimensionId);
+        GameProfileCache.setUsesAuthentication(false);
+        UUID uuid = UUIDUtil.createOfflinePlayerUUID(username);
+        GameProfile gameprofile = new GameProfile(uuid, username);
+
+        fetchGameProfile(username).whenCompleteAsync((p, t) -> {
+            GameProfile current = gameprofile;
+            if (p.isPresent())
+            {
+                current = p.get();
+            }
+
+            EntityPlayerFake instance = new EntityPlayerFake(server, worldIn, current, ClientInformation.createDefault());
+            instance.fixStartingPosition = () -> instance.snapTo(pos.x, pos.y, pos.z, (float) yaw, (float) pitch);
+            server.getPlayerList().placeNewPlayer(new FakeClientConnection(PacketFlow.SERVERBOUND), instance, new CommonListenerCookie(current, 0, instance.clientInformation(), false));
+            instance.teleportTo(worldIn, pos.x, pos.y, pos.z, Set.of(), (float) yaw, (float) pitch, true);
+            instance.setHealth(20.0F);
+            instance.unsetRemoved();
+            instance.getAttribute(Attributes.STEP_HEIGHT).setBaseValue(0.6F);
+            instance.gameMode.changeGameModeForPlayer(gamemode);
+            //server.getPlayerList().broadcastAll(new ClientboundRotateHeadPacket(instance, (byte) (instance.yHeadRot * 256 / 360)), dimensionId);
+            //server.getPlayerList().broadcastAll(ClientboundEntityPositionSyncPacket.of(instance), dimensionId);
+            //instance.entityData.set(DATA_PLAYER_MODE_CUSTOMISATION, (byte) 0x7f);
+            instance.getAbilities().flying = true;
+        }, server);
+
+        WorldLoader.LOGGER.info("Fake player created with uuid: {}", uuid);
     }
 
-    private EntityPlayerFake(MinecraftServer server, ServerWorld worldIn, GameProfile profile)
+    private static CompletableFuture<Optional<GameProfile>> fetchGameProfile(final String name) {
+        return SkullBlockEntity.fetchGameProfile(name);
+    }
+
+    private EntityPlayerFake(MinecraftServer server, ServerLevel worldIn, GameProfile profile, ClientInformation cli)
     {
-        super(server, worldIn, profile, SyncedClientOptions.createDefault());
+        super(server, worldIn, profile, cli);
     }
 }
