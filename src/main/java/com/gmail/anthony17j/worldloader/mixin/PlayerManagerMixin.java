@@ -31,7 +31,7 @@ public abstract class PlayerManagerMixin {
 
     @Inject(method = "placeNewPlayer", at = @At("TAIL"))
     public void placeNewPlayer(Connection connection, ServerPlayer serverPlayer, CommonListenerCookie commonListenerCookie, CallbackInfo ci) {
-        if (serverPlayer.getGameProfile().getName().equals(playerName)) {
+        if (serverPlayer.getGameProfile().name().equals(playerName)) {
             this.players.remove(serverPlayer);
         }
     }

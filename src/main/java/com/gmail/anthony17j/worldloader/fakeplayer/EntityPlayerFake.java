@@ -10,8 +10,8 @@ import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.CommonListenerCookie;
-import net.minecraft.server.players.GameProfileCache;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.component.ResolvableProfile;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.SkullBlockEntity;
@@ -29,20 +29,15 @@ public class EntityPlayerFake extends ServerPlayer {
     public static void createFake(String username, MinecraftServer server, Vec3 pos, double yaw, double pitch, ResourceKey<Level> dimensionId, GameType gamemode)
     {
         ServerLevel worldIn = server.getLevel(dimensionId);
-        GameProfileCache.setUsesAuthentication(false);
+        server.services().nameToIdCache().resolveOfflineUsers(false);
         UUID uuid = UUIDUtil.createOfflinePlayerUUID(username);
         GameProfile gameprofile = new GameProfile(uuid, username);
 
-        fetchGameProfile(username).whenCompleteAsync((p, t) -> {
-            GameProfile current = gameprofile;
-            if (p.isPresent())
-            {
-                current = p.get();
-            }
+        fetchGameProfile(server, gameprofile.id()).whenCompleteAsync((p, t) -> {
 
-            EntityPlayerFake instance = new EntityPlayerFake(server, worldIn, current, ClientInformation.createDefault());
+            EntityPlayerFake instance = new EntityPlayerFake(server, worldIn, gameprofile, ClientInformation.createDefault());
             instance.fixStartingPosition = () -> instance.snapTo(pos.x, pos.y, pos.z, (float) yaw, (float) pitch);
-            server.getPlayerList().placeNewPlayer(new FakeClientConnection(PacketFlow.SERVERBOUND), instance, new CommonListenerCookie(current, 0, instance.clientInformation(), false));
+            server.getPlayerList().placeNewPlayer(new FakeClientConnection(PacketFlow.SERVERBOUND), instance, new CommonListenerCookie(gameprofile, 0, instance.clientInformation(), false));
             instance.teleportTo(worldIn, pos.x, pos.y, pos.z, Set.of(), (float) yaw, (float) pitch, true);
             instance.setHealth(20.0F);
             instance.unsetRemoved();
@@ -57,8 +52,9 @@ public class EntityPlayerFake extends ServerPlayer {
         WorldLoader.LOGGER.info("Fake player created with uuid: {}", uuid);
     }
 
-    private static CompletableFuture<Optional<GameProfile>> fetchGameProfile(final String name) {
-        return SkullBlockEntity.fetchGameProfile(name);
+    private static CompletableFuture<GameProfile> fetchGameProfile(MinecraftServer server, final UUID name) {
+        final ResolvableProfile resolvableProfile = ResolvableProfile.createUnresolved(name);
+        return resolvableProfile.resolveProfile(server.services().profileResolver());
     }
 
     private EntityPlayerFake(MinecraftServer server, ServerLevel worldIn, GameProfile profile, ClientInformation cli)
