@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "id": "worldloader-gametest",
+  "version": "1.0.0",
+  "name": "WorldLoader GameTest",
+  "environment": "*",
+  "entrypoints": {
+    "fabric-gametest": [
+      "com.gmail.anthony17j.worldloader.test.WorldLoaderGameTest"
+    ]
+  },
+  "depends": {
+    "worldloader": "*"
+  }
+}

@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 
-import static com.gmail.anthony17j.worldloader.WorldLoader.playerName;
+import static com.gmail.anthony17j.worldloader.WorldLoader.WORLD_LOADER_NAME_PREFIX;
 
 @Mixin(PlayerList.class)
 public abstract class PlayerManagerMixin {
@@ -24,21 +24,21 @@ public abstract class PlayerManagerMixin {
 
     @Inject(method = "broadcastSystemMessage(Lnet/minecraft/network/chat/Component;Z)V", at = @At("HEAD"), cancellable = true)
     public void broadcastSystemMessage(Component component, boolean bl, CallbackInfo ci) {
-        if (component.toString().contains(playerName)) {
+        if (component.toString().contains(WORLD_LOADER_NAME_PREFIX)) {
             ci.cancel();
         }
     }
 
     @Inject(method = "placeNewPlayer", at = @At("TAIL"))
     public void placeNewPlayer(Connection connection, ServerPlayer serverPlayer, CommonListenerCookie commonListenerCookie, CallbackInfo ci) {
-        if (serverPlayer.getGameProfile().name().equals(playerName)) {
+        if (serverPlayer.getGameProfile().name().startsWith(WORLD_LOADER_NAME_PREFIX)) {
             this.players.remove(serverPlayer);
         }
     }
 
     @Inject(method = "broadcastAll(Lnet/minecraft/network/protocol/Packet;)V", at = @At("HEAD"), cancellable = true)
     public void broadcastAll(Packet<?> packet, CallbackInfo ci) {
-        if (packet.toString().contains(playerName)) {
+        if (packet.toString().contains(WORLD_LOADER_NAME_PREFIX)) {
             ci.cancel();
         }
     }
