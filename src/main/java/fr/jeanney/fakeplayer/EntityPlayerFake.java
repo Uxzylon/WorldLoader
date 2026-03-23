@@ -1,6 +1,6 @@
-package com.gmail.anthony17j.worldloader.fakeplayer;
+package fr.jeanney.fakeplayer;
 
-import com.gmail.anthony17j.worldloader.WorldLoader;
+import fr.jeanney.WorldLoader;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.protocol.PacketFlow;

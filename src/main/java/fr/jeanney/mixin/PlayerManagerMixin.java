@@ -1,4 +1,4 @@
-package com.gmail.anthony17j.worldloader.mixin;
+package fr.jeanney.mixin;
 
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 
-import static com.gmail.anthony17j.worldloader.WorldLoader.WORLD_LOADER_NAME_PREFIX;
+import static fr.jeanney.WorldLoader.WORLD_LOADER_NAME_PREFIX;
 
 @Mixin(PlayerList.class)
 public abstract class PlayerManagerMixin {

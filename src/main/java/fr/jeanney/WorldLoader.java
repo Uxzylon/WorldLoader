@@ -1,12 +1,12 @@
-package com.gmail.anthony17j.worldloader;
+package fr.jeanney;
 
-import com.gmail.anthony17j.worldloader.fakeplayer.EntityPlayerFake;
+import fr.jeanney.fakeplayer.EntityPlayerFake;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLevelEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
@@ -43,9 +43,7 @@ public class WorldLoader implements ModInitializer {
 	public void onInitialize() {
 		reloadConfig();
 
-		ServerWorldEvents.LOAD.register(((server, world) -> {
-			trySpawnLoaderForWorld(server, world);
-		}));
+		ServerLevelEvents.LOAD.register((WorldLoader::trySpawnLoaderForWorld));
 
 		ServerLifecycleEvents.SERVER_STARTED.register(WorldLoader::spawnConfiguredLoadersForLoadedWorlds);
 		ServerLifecycleEvents.SERVER_STOPPING.register(server -> SPAWNED_WORLDS.clear());

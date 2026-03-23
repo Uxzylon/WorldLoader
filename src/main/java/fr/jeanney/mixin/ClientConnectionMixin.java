@@ -1,6 +1,6 @@
-package com.gmail.anthony17j.worldloader.mixin;
+package fr.jeanney.mixin;
 
-import com.gmail.anthony17j.worldloader.interfaces.ClientConnectionInterface;
+import fr.jeanney.interfaces.ClientConnectionInterface;
 import io.netty.channel.Channel;
 import net.minecraft.network.Connection;
 import org.spongepowered.asm.mixin.Mixin;

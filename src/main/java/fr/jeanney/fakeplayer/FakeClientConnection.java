@@ -1,6 +1,6 @@
-package com.gmail.anthony17j.worldloader.fakeplayer;
+package fr.jeanney.fakeplayer;
 
-import com.gmail.anthony17j.worldloader.interfaces.ClientConnectionInterface;
+import fr.jeanney.interfaces.ClientConnectionInterface;
 import io.netty.channel.embedded.EmbeddedChannel;
 import net.minecraft.network.Connection;
 import net.minecraft.network.PacketListener;
