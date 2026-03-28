@@ -6,7 +6,7 @@
   "environment": "*",
   "entrypoints": {
     "fabric-gametest": [
-      "com.gmail.anthony17j.worldloader.test.WorldLoaderGameTest"
+      "fr.jeanney.WorldLoaderGameTest"
     ]
   },
   "depends": {

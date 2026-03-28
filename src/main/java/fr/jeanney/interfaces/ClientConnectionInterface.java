@@ -1,4 +1,4 @@
-package com.gmail.anthony17j.worldloader.interfaces;
+package fr.jeanney.interfaces;
 
 import io.netty.channel.Channel;
 

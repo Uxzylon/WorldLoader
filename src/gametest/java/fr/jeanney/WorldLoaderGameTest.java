@@ -1,6 +1,6 @@
-package com.gmail.anthony17j.worldloader.test;
+package fr.jeanney;
 
-import com.gmail.anthony17j.worldloader.WorldLoader;
+import fr.jeanney.WorldLoader;
 import net.fabricmc.fabric.api.gametest.v1.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.MinecraftServer;
